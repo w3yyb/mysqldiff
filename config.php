@@ -11,5 +11,6 @@ return [
 		"user" => "root",
 		"pwd" => "root",
 		"db" => "test2",
-	],	
+	],
+	"onlycheck" =>1 //只对比，不修复	
 ];
