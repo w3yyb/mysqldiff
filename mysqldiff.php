@@ -11,12 +11,14 @@ class MysqlDiff
     public $success_repair_tables = [];
     public $repair_fields = [];
 
+
     public function __construct(array $conf)
     {
         $dbms = 'mysql';
 
         $master = $conf['master'];
         $slave = $conf['slave'];
+        $onlycheck = $conf['onlycheck'];
 
         $dsn = sprintf("mysql:host=%s;dbname=%s", $master['host'], $master['db']);
         $dbh_conn_master = new PDO($dsn, $master['user'], $master['pwd']);
@@ -26,6 +28,11 @@ class MysqlDiff
 
         $this->conn['master'] = $dbh_conn_master;
         $this->conn['slave'] = $dbh_conn_slave;
+        $this->conf['onlycheck'] = $onlycheck;
+        $this->conf['master'] = $master;
+        $this->conf['slave'] = $slave;
+        
+
     }
 
     public function listTables()
@@ -81,9 +88,14 @@ class MysqlDiff
 
                 $tmp = $matchs[0] . ';';
                 $repair_sql = sprintf('ALTER TABLE %s ADD %s', $table, $tmp);
-
-                $ret = $this->conn['slave']->exec($repair_sql);
-                if ($ret !== 0) {
+                echo $this->conf['master']['host'].':'.$this->conf['master']['db'].'==>';
+                echo $this->conf['slave']['host'].':'.$this->conf['slave']['db'].'  -- ';
+                if ($this->conf['onlycheck']) {
+                    print($repair_sql).'<br>';
+                }else {
+                    $ret = $this->conn['slave']->exec($repair_sql);
+                }
+                if ( isset($ret) && ($ret !== 0)) {
                     $this->error_repair_tables[] = $table;
                 }
                 $this->success_repair_tables[] = $table;
@@ -93,6 +105,11 @@ class MysqlDiff
 
     public function run()
     {
+        if ($this->conf['onlycheck']) {
+           echo '对比数据库<br>';
+        }else {
+         echo    '修复数据库<br>';
+        }
         list($master_tables, $slave_tables) = $this->listTables();
 
         foreach ($master_tables as $table) {
@@ -123,11 +140,15 @@ $conf = require dirname(__FILE__) . '/config.php';
 $md = new MysqlDiff($conf);
 $md->run();
 
+
+
+
+
 list($success_add_tables, $error_add_tables) = $md->getAddTables();
 list($success_repair_tables, $error_repair_tables) = $md->getRepairTables();
 
-echo sprintf("Success add tables:\t%s\n", implode(',', $success_add_tables));
-echo sprintf("Error add tables:\t%s\n", implode(',', $error_add_tables));
+echo sprintf("Success add tables:\t%s\n", implode(',', $success_add_tables)).'<br>';
+echo sprintf("Error add tables:\t%s\n", implode(',', $error_add_tables)).'<br>';
 
-echo sprintf("Success repair tables:\t%s\n", implode(',', $success_repair_tables));
-echo sprintf("Error repair tables:\t%s\n", implode(',', $error_repair_tables));
+echo sprintf("Success repair tables:\t%s\n", implode(',', $success_repair_tables)).'<br>';
+echo sprintf("Error repair tables:\t%s\n", implode(',', $error_repair_tables)).'<br>';
