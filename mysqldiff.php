@@ -88,8 +88,7 @@ class MysqlDiff
 
                 $tmp = $matchs[0] . ';';
                 $repair_sql = sprintf('ALTER TABLE %s ADD %s', $table, $tmp);
-                echo $this->conf['master']['host'].':'.$this->conf['master']['db'].'==>';
-                echo $this->conf['slave']['host'].':'.$this->conf['slave']['db'].'  -- ';
+              
                 if ($this->conf['onlycheck']) {
                     print($repair_sql).'<br>';
                 }else {
@@ -110,6 +109,8 @@ class MysqlDiff
         }else {
          echo    '修复数据库<br>';
         }
+        echo $this->conf['master']['host'].':'.$this->conf['master']['db'].'==>';
+        echo $this->conf['slave']['host'].':'.$this->conf['slave']['db'].' <br>';
         list($master_tables, $slave_tables) = $this->listTables();
 
         foreach ($master_tables as $table) {
