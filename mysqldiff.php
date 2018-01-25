@@ -47,7 +47,7 @@ class MysqlDiff
 
     public function getCreateTableSql($table)
     {
-        $sql = 'SHOW CREATE TABLE ' . $table . ';';
+        $sql = 'SHOW CREATE TABLE `' . $table . '`;';
         $query = $this->conn['master']->query($sql);
         $row = $query->fetch(PDO::FETCH_ASSOC);
         $this->create_table_sqls[$table] = $row['Create Table'];
