@@ -12,7 +12,7 @@ Requirements
 Installation
 ------------
 ```
-git clone https://github.com/exinnet/mysqldiff.git
+git clone https://github.com/w3yyb/mysqldiff.git
 cd mysqldiff
 vi config.php # config mysql connection info
 ```
@@ -23,6 +23,9 @@ Usage
 ```bash
 	php mysqldiff.php
 ```
+```open in browser
+        http://localhost/mysqldiff/mysqldiff.php
+````
 
 Custom
 --------
