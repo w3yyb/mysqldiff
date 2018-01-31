@@ -125,7 +125,8 @@ class MysqlDiff
             if (!isset($exist_key_slave[$item])) {
                 $repair_sql = sprintf("ALTER TABLE `%s` ADD %s", $table, $item.';');
                 if ($this->conf['onlycheck']) {
-                    print($repair_sql).'<br>';
+                    //print($repair_sql).'<br>';
+                    print('<font color=#D2691E>'.$repair_sql.'</font>').'<br>';
                     $ret='no';
                 } else {
                     print $repair_sql.'<br>';
