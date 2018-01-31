@@ -8,6 +8,7 @@ Requirements
 
 * MySQL
 * PHP
+* Pdo extension
 
 Installation
 ------------
