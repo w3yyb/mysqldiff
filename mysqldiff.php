@@ -89,14 +89,16 @@ class MysqlDiff
 
                 $tmp = $matchs[0] . ';';
                 if (!in_array($field, $slave_table_fields_simgle)) {
+                    $color='green';
                     $repair_sql = sprintf('ALTER TABLE `%s` ADD %s', $table, $tmp);
                 } else {
+                    $color='blue';
                     $tmp = "`$field` ".$tmp;
                     $repair_sql = sprintf('ALTER TABLE `%s` CHANGE COLUMN %s', $table, $tmp);
                 }
               
                 if ($this->conf['onlycheck']) {
-                    print($repair_sql).'<br>';
+                    print('<font color='.$color.'>'.$repair_sql.'</font>').'<br>';
                     $ret='no';
                 } else {
                     print($repair_sql).'<br>';
