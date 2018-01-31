@@ -1,4 +1,4 @@
-phpmysqldiff - A PHP Console Tool
+php mysqldiff - A PHP Mysql Diff and Sync Tool
 =========================
 
 A mysql table diff tool written in php.
