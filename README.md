@@ -48,6 +48,7 @@ you would like to adjust some params to make it suited for your server.
 			"pwd" => "root",
 			"db" => "test2",
 		],
+                "onlycheck" =>1 //只对比，不修复 
 	];
     ```
 
