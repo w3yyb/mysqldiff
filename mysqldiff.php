@@ -72,12 +72,12 @@ class MysqlDiff
         $stmt = $this->conn['master']->prepare($_sql);
         $stmt->execute();
         $master_table_fields = $stmt->fetchAll();
-        // $master_table_fields = array_column($master_table_fields, 'Field');
+        $master_table_fields_simgle = array_column($master_table_fields, 'Field');
         $master_table_fields = $this->arrayColumnMulti($master_table_fields, $fieldarr);
         $stmt = $this->conn['slave']->prepare($_sql);
         $stmt->execute();
         $slave_table_fields = $stmt->fetchAll();
-        //$slave_table_fields = array_column($slave_table_fields, 'Field');
+        $slave_table_fields_simgle = array_column($slave_table_fields, 'Field');
         $slave_table_fields = $this->arrayColumnMulti($slave_table_fields, $fieldarr);
 
         foreach ($master_table_fields as $field) {
@@ -88,7 +88,12 @@ class MysqlDiff
                 preg_match($pattern, $_str, $matchs);
 
                 $tmp = $matchs[0] . ';';
-                $repair_sql = sprintf('ALTER TABLE `%s` ADD %s', $table, $tmp);
+                if (!in_array($field, $slave_table_fields_simgle)) {
+                    $repair_sql = sprintf('ALTER TABLE `%s` ADD %s', $table, $tmp);
+                } else {
+                    $tmp = "`$field` ".$tmp;
+                    $repair_sql = sprintf('ALTER TABLE `%s` CHANGE COLUMN %s', $table, $tmp);
+                }
               
                 if ($this->conf['onlycheck']) {
                     print($repair_sql).'<br>';
