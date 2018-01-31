@@ -31,8 +31,6 @@ class MysqlDiff
         $this->conf['onlycheck'] = $onlycheck;
         $this->conf['master'] = $master;
         $this->conf['slave'] = $slave;
-        
-
     }
 
     public function listTables()
@@ -48,6 +46,7 @@ class MysqlDiff
     public function getCreateTableSql($table)
     {
         $sql = 'SHOW CREATE TABLE `' . $table . '`;';
+        
         $query = $this->conn['master']->query($sql);
         $row = $query->fetch(PDO::FETCH_ASSOC);
         $this->create_table_sqls[$table] = $row['Create Table'];
@@ -57,11 +56,18 @@ class MysqlDiff
     public function addTables($table)
     {
         $_sql = $this->getCreateTableSql($table);
-        $ret = $this->conn['slave']->exec($_sql);
+        print $_sql.'<br>';
+        if ($this->conf['onlycheck']) {
+            $ret='no';
+        } else {
+            $ret = $this->conn['slave']->exec($_sql);
+        }
         if ($ret !== 0) {
             $this->error_add_tables[] = $table;
         }
-        $this->success_add_tables[] = $table;
+        if ($ret!='no') {
+            $this->success_add_tables[] = $table;
+        }
     }
 
     public function repairTable($table)
@@ -70,13 +76,13 @@ class MysqlDiff
 
         $_sql = 'DESC ' . $table;
 
-        $stmt = $this->conn['master']->prepare($_sql);  
+        $stmt = $this->conn['master']->prepare($_sql);
         $stmt->execute();
         $master_table_fields = $stmt->fetchAll();
         $master_table_fields = array_column($master_table_fields, 'Field');
 
-        $stmt = $this->conn['slave']->prepare($_sql);  
-        $stmt->execute();  
+        $stmt = $this->conn['slave']->prepare($_sql);
+        $stmt->execute();
         $slave_table_fields = $stmt->fetchAll();
         $slave_table_fields = array_column($slave_table_fields, 'Field');
 
@@ -91,10 +97,10 @@ class MysqlDiff
               
                 if ($this->conf['onlycheck']) {
                     print($repair_sql).'<br>';
-                }else {
+                } else {
                     $ret = $this->conn['slave']->exec($repair_sql);
                 }
-                if ( isset($ret) && ($ret !== 0)) {
+                if (isset($ret) && ($ret !== 0)) {
                     $this->error_repair_tables[] = $table;
                 }
                 $this->success_repair_tables[] = $table;
@@ -105,9 +111,9 @@ class MysqlDiff
     public function run()
     {
         if ($this->conf['onlycheck']) {
-           echo '对比数据库<br>';
-        }else {
-         echo    '修复数据库<br>';
+            echo '对比数据库<br>';
+        } else {
+            echo    '修复数据库<br>';
         }
         echo $this->conf['master']['host'].':'.$this->conf['master']['db'].'==>';
         echo $this->conf['slave']['host'].':'.$this->conf['slave']['db'].' <br>';
@@ -116,9 +122,7 @@ class MysqlDiff
         foreach ($master_tables as $table) {
             if (!in_array($table, $slave_tables)) {
                 $this->addTables($table);
-            }
-            else
-            {
+            } else {
                 $this->repairTable($table);
             }
         }
@@ -133,7 +137,6 @@ class MysqlDiff
     {
         return [array_unique($this->success_repair_tables), array_unique($this->error_repair_tables)];
     }
-
 }
 
 $conf = require dirname(__FILE__) . '/config.php';
