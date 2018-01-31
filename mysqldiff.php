@@ -116,7 +116,7 @@ class MysqlDiff
         $exist_key_slave = array_flip($match_slave[0]);
         foreach ($match_master[0] as $item) {
             if (!isset($exist_key_slave[$item])) {
-                $repair_sql = sprintf("ALTER TABLE `%s` ADD %s", $table, $item);
+                $repair_sql = sprintf("ALTER TABLE `%s` ADD %s", $table, $item.';');
                 if ($this->conf['onlycheck']) {
                     print($repair_sql).'<br>';
                     $ret='no';
