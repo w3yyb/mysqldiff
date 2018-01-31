@@ -88,7 +88,7 @@ class MysqlDiff
                 preg_match($pattern, $_str, $matchs);
 
                 $tmp = $matchs[0] . ';';
-                $repair_sql = sprintf('ALTER TABLE %s ADD %s', $table, $tmp);
+                $repair_sql = sprintf('ALTER TABLE `%s` ADD %s', $table, $tmp);
               
                 if ($this->conf['onlycheck']) {
                     print($repair_sql).'<br>';
